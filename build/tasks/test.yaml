@@ -1,0 +1,33 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: unit-test 
+spec:
+  params:
+    - name: maven-image
+      default: quay.io/ibmgaragecloud/maven:3.6.3-jdk-11-slim
+  resources:
+    inputs:
+      - name: source
+        type: git
+    outputs:
+      - name: intermediate-image
+        type: image
+  steps :
+    - name: test
+      image: $(params.maven-image)
+      workingdir: /workspace/source 
+      script: |
+        if [[ -f "./mvnw" ]]; then
+          ./mvnw test
+        else
+          mvn test
+        fi
+  volumes:
+    - emptyDir: {}
+      name: envparams
+    - emptyDir: {}
+      name: gen-source
+    - name: pipeline-cache
+      persistentVolumeClaim:
+        claimName: pipeline-task-cache-pvc

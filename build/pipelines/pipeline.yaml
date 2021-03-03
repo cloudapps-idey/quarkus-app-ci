@@ -1,0 +1,127 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  creationTimestamp: "2020-06-26T14:11:45Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: quarkus-app
+    pipeline.openshift.io/type: kubernetes
+  name: quarkus-app
+  namespace: quarkus-app 
+spec:
+  resources:
+  - name: app-source
+    type: git
+  - name: intermediate-image
+    type: image
+  - name: runtime-image
+    type: image
+  params:
+  - name: templateFileName
+    type: string
+    default: deploy/template/deploy-app-template.yaml
+  - name: appName
+    type: string
+    default: quarkus-app 
+  - name: appGroup
+    type: string
+    default: Liberty
+  - name: quay-io-account
+    type: string
+    default: ""
+  - name: quay-io-repository
+    type: string
+    default: "quarkus-app"
+  - name: quay-io-image-tag-name
+    type: string
+    default: "latest"
+  - name: STORAGE_DRIVER
+    description: The Buildah storage STORAGE_DRIVER
+    type: string
+    default: 'overlay'
+  - name: maven-image
+    default: quay.io/ibmgaragecloud/maven:3.6.3-jdk-11-slim
+  tasks:
+  - name: build
+    params:
+      - name: STORAGE_DRIVER
+        value: $(params.STORAGE_DRIVER)
+    resources:
+      inputs:
+      - name: source
+        resource: app-source
+      outputs:
+      - name: intermediate-image
+        resource: intermediate-image
+    taskRef:
+      kind: Task
+      name: build
+  - name: unit-test 
+    params:
+      - name: maven-image
+        value: $(params.maven-image)
+    resources:
+      inputs:
+      - name: source
+        resource: app-source
+      outputs:
+      - name: intermediate-image
+        resource: intermediate-image
+    taskRef:
+      kind: Task
+      name: unit-test 
+    runAfter:
+      - build
+  - name: create-runtime-image
+    params:
+      - name: STORAGE_DRIVER
+        value: $(params.STORAGE_DRIVER)
+    resources:
+      inputs:
+      - name: intermediate-image
+        resource: intermediate-image
+      outputs:
+      - name: runtime-image
+        resource: runtime-image
+    taskRef:
+      kind: Task
+      name: create-runtime-image
+    runAfter:
+      - unit-test 
+  - name: clear-resources
+    params:
+      - name: appName
+        value: $(params.appName)
+    taskRef:
+      kind: Task
+      name: clear-resources
+    runAfter:
+      - unit-test 
+  - name: push-image-to-quay
+    params:
+      - name: quay-io-account
+        value: $(params.quay-io-account)
+      - name: quay-io-repository
+        value: $(params.quay-io-repository)
+      - name: quay-io-image-tag-name
+        value: $(params.quay-io-image-tag-name)
+      - name: STORAGE_DRIVER
+        value: $(params.STORAGE_DRIVER)      
+    resources:
+      inputs:
+      - name: runtime-image
+        resource: runtime-image
+    taskRef:
+      kind: Task
+      name: push-image-to-quay
+    runAfter:
+      - create-runtime-image
+  - name: clear-buildah-repo
+    params:
+      - name: STORAGE_DRIVER
+        value: $(params.STORAGE_DRIVER)
+    taskRef:
+      kind: Task
+      name: clear-buildah-repo
+    runAfter:
+      - push-image-to-quay

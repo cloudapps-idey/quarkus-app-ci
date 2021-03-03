@@ -1,0 +1,10 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: quarkus-app-source-code
+  namespace: quarkus-app
+spec:
+  params:
+  - name: url
+    value: https://github.com/cloudapps-idey/quarkus-app.git
+  type: git
