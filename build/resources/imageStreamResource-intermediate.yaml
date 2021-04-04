@@ -1,10 +1,10 @@
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
-  name: intermediate
+  name: intermediate-image
   namespace: quarkus-app
 spec:
   params:
   - name: url
-    value: intermediate
+    value: image-registry.openshift-image-registry.svc:5000/quarkus-app/quarkus-app
   type: image

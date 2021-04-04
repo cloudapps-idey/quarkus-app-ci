@@ -1,0 +1,10 @@
+apiVersion: v1
+imagePullSecrets:
+- name: default-dockercfg-c469w
+kind: ServiceAccount
+metadata:
+  name: default
+  namespace: quarkus-test
+secrets:
+- name: auay-auth-secret
+- name: default-dockercfg-c469w

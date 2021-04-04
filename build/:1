@@ -1,0 +1,20 @@
+oc delete route el-quarkus-app-event-listener 
+oc delete triggerbindings quarkus-app-pipeline-binding
+oc delete triggertemplates quarkus-app-trigger-pipeline-template
+oc delete eventlisteners quarkus-app-event-listener 
+
+
+
+oc delete eventlisteners quarkus-app-github-listener-interceptor
+oc delete triggertemplates quarkus-app-trigger-pipeline-template
+oc delete triggerbindings quarkus-app-pipeline-binding
+oc delete route quarkus-app-github-listener-el
+
+oc delete eventlisteners cicd 
+oc delete triggertemplates cicd-template
+oc delete triggerbindings cicd-binding
+
+oc get eventlisteners
+oc get route 
+oc get triggerbindings
+oc get triggertemplates

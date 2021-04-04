@@ -11,10 +11,7 @@ spec:
         name: quarkus-app-source-code
     - name: intermediate-image
       resourceRef:
-        name: intermediate
-    - name: runtime-image
-      resourceRef:
-        name: quarkus-app
+        name: intermediate-image
   params:
     - name: templateFileName
       value: deploy/template/deploy-app-template.yaml
@@ -28,3 +25,4 @@ spec:
       value: "quarkus-app"
     - name: quay-io-image-tag-name
       value: "latest"
+    

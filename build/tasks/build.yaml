@@ -113,15 +113,6 @@ spec:
       volumeMounts:
         - name: pipeline-cache
           mountPath: /var/lib/containers
-    - name: test
-      image: $(params.maven-image)
-      workingdir: /workspace/source 
-      script: |
-        if [[ -f "./mvnw" ]]; then
-          ./mvnw test
-        else
-          mvn test
-        fi
   volumes:
     - emptyDir: {}
       name: envparams

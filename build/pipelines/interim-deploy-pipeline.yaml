@@ -59,6 +59,19 @@ spec:
     taskRef:
       kind: Task
       name: build
+  - name: interim-deploy
+    params:
+      - name: DEPLOYMENT
+        value: $(params.APP_NAME)
+    resources:
+      inputs:
+      - name: intermediate-image
+        resource: intermediate-image
+    taskRef:
+      kind: Task
+      name: interim-deploy
+    runAfter:
+      - unit-test   
   - name: unit-test 
     params:
       - name: maven-image
@@ -83,7 +96,7 @@ spec:
       kind: Task
       name: clear-resources
     runAfter:
-      - unit-test
+      - interim-deploy
   - name: push-image-to-quay
     params:
       - name: quay-io-account

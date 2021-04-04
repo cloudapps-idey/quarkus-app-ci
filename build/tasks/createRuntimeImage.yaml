@@ -26,8 +26,6 @@ spec:
       args:
         - |-
           echo "FROM $(resources.inputs.intermediate-image.url) as intermediate-image" > ext-dockerfile.gen
-          echo "FROM docker.io/openliberty/open-liberty as runtime-image" >> ext-dockerfile.gen
-          echo "COPY --from=intermediate-image /tmp/src/target/quarkus-app-1.0.0-SNAPSHOT.jar /config/apps/quarkus-app-1.0.0-SNAPSHOT.jar" >> ext-dockerfile.gen
           echo "------------------------------"
           cat ext-dockerfile.gen
           echo "------------------------------"

@@ -1,0 +1,39 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: template-cicd
+spec:
+  params:
+    - name: gitrevision
+      description: The git revision
+      default: master
+    - name: gitrepositoryurl
+      description: The git repository url
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: quarkus-app-run-pr-
+      spec:
+        pipelineRef:
+           name: quarkus-app
+        resources:
+          - name: app-source
+            resourceRef:
+              name: quarkus-app-source-code
+          - name: intermediate-image
+            resourceRef:
+              name: intermediate-image
+        params:
+          - name: templateFileName
+            value: deploy/template/deploy-app-template.yaml
+          - name: appName
+            value: quarkus-app 
+          - name: appGroup
+            value: Liberty
+          - name: quay-io-account
+            value: "idey"
+          - name: quay-io-repository
+            value: "quarkus-app"
+          - name: quay-io-image-tag-name
+            value: "latest"
